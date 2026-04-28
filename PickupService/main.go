@@ -25,6 +25,14 @@ func pickupHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// ✅ TAMBAH INI
+func ProcessPickup(paymentStatus string, weight int) string {
+	if paymentStatus == "paid" {
+		return "scheduled"
+	}
+	return "pending"
+}
+
 func main() {
 	http.HandleFunc("/pickup", pickupHandler)
 	http.ListenAndServe(":8082", nil)
