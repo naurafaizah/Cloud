@@ -17,7 +17,10 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                bat 'go test ./...'
+                bat '''
+                go list ./... | findstr /V functional > packages.txt
+                for /f %i in (packages.txt) do go test %i
+                '''
             }
         }
 
