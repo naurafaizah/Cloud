@@ -17,9 +17,7 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                bat '''
-                go test $(go list ./... | findstr /V tests/functional)
-                '''
+                bat 'go test ./...'
             }
         }
 
@@ -32,22 +30,18 @@ pipeline {
         // ================= PAYMENT =================
         stage('Build Docker Image') {
             steps {
-                bat '''
-                cd PaymentService
-                docker build -t payment-service:latest .
-                cd ..
-                '''
+                dir('PaymentService') {
+                    bat 'docker build -t payment-service:latest .'
+                }
             }
         }
 
         // ================= PICKUP =================
         stage('Build Pickup Service') {
             steps {
-                bat '''
-                cd PickupService
-                docker build -t pickup-service:latest .
-                cd ..
-                '''
+                dir('PickupService') {
+                    bat 'docker build -t pickup-service:latest .'
+                }
             }
         }
 
@@ -55,7 +49,9 @@ pipeline {
         stage('Functional Test Payment') {
             steps {
                 bat '''
-                start /b go run PaymentService/main.go
+                cd PaymentService
+                start /b go run .
+                cd ..
                 ping 127.0.0.1 -n 6 > nul
 
                 curl -X POST http://localhost:8081/payment ^
@@ -69,16 +65,21 @@ pipeline {
         stage('Functional Test Pickup') {
             steps {
                 bat '''
-                start /b go run PickupService/main.go
+                cd PickupService
+                start /b go run .
+                cd ..
                 ping 127.0.0.1 -n 6 > nul
 
-                curl -X GET http://localhost:8082/pickup
+                curl -X POST http://localhost:8082/pickup ^
+                -H "Content-Type: application/json" ^
+                -d "{\\"order_id\\":\\"ORD1\\",\\"payment_status\\":\\"paid\\",\\"weight\\":2}"
                 '''
             }
         }
 
         stage('Push Image') {
             steps {
+                bat 'docker images'
                 bat '''
                 docker tag payment-service:latest naurafaizah/payment-service:latest
                 docker push naurafaizah/payment-service:latest
