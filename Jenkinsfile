@@ -56,7 +56,7 @@ pipeline {
             steps {
                 bat '''
                 start /b go run PaymentService/main.go
-                timeout /t 5
+                ping 127.0.0.1 -n 6 > nul
 
                 curl -X POST http://localhost:8081/payment ^
                 -H "Content-Type: application/json" ^
