@@ -17,7 +17,9 @@ pipeline {
 
         stage('Unit Test') {
             steps {
-                bat 'go test ./PaymentService/... ./PickupService/...'
+                bat '''
+                go test $(go list ./... | findstr /V tests/functional)
+                '''
             }
         }
 
