@@ -80,8 +80,8 @@ pipeline {
         stage('Push Image') {
             steps {
                 bat '''
-                docker tag payment-service:latest nadzalla/payment-service:latest
-                docker push nadzalla/payment-service:latest
+                docker tag payment-service:latest naurafaizah/payment-service:latest
+                docker push naurafaizah/payment-service:latest
                 '''
             }
         }
