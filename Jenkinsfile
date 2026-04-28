@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout Repo') {
             steps {
                 deleteDir()
-                git branch: 'main', url: 'https://github.com/nadzallad/Cloud2.git'
+                git branch: 'main', url: 'https://github.com/naurafaizah/Cloud.git'
             }
         }
 
@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        // ================= PAYMENT (punya temen - TIDAK DIUBAH) =================
+        // ================= PAYMENT =================
         stage('Build Docker Image') {
             steps {
                 bat '''
@@ -38,11 +38,11 @@ pipeline {
             }
         }
 
-        // ================= PICKUP (punya kamu - DITAMBAH) =================
+        // ================= PICKUP =================
         stage('Build Pickup Service') {
             steps {
                 bat '''
-                cd pickup-service
+                cd PickupService
                 docker build -t pickup-service:latest .
                 cd ..
                 '''
@@ -67,7 +67,7 @@ pipeline {
         stage('Functional Test Pickup') {
             steps {
                 bat '''
-                start /b go run pickup-service/main.go
+                start /b go run PickupService/main.go
                 timeout /t 5
 
                 curl -X GET http://localhost:8082/pickup
