@@ -70,7 +70,7 @@ pipeline {
             steps {
                 bat '''
                 start /b go run PickupService/main.go
-                timeout /t 5
+                ping 127.0.0.1 -n 6 > nul
 
                 curl -X GET http://localhost:8082/pickup
                 '''
