@@ -3,28 +3,30 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"net/http/httptest"
+	"net/http"
 	"testing"
 )
 
 func TestPickupEndpoint(t *testing.T) {
-	reqBody := PickupRequest{
-		OrderID:       "ORD1",
-		PaymentStatus: "paid",
-		Weight:        2,
+	reqBody := map[string]interface{}{
+		"order_id":       "ORD1",
+		"payment_status": "paid",
+		"weight":         2,
 	}
 
 	body, _ := json.Marshal(reqBody)
 
-	req := httptest.NewRequest("POST", "/pickup", bytes.NewBuffer(body))
-	w := httptest.NewRecorder()
+	resp, err := http.Post("http://localhost:8082/pickup", "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatalf("Request failed: %v", err)
+	}
 
-	pickupHandler(w, req)
+	defer resp.Body.Close()
 
-	var res PickupResponse
-	json.NewDecoder(w.Body).Decode(&res)
+	var res map[string]interface{}
+	json.NewDecoder(resp.Body).Decode(&res)
 
-	if res.Status != "scheduled" {
-		t.Errorf("Expected scheduled, got %s", res.Status)
+	if res["status"] != "scheduled" {
+		t.Errorf("Expected scheduled, got %v", res["status"])
 	}
 }
